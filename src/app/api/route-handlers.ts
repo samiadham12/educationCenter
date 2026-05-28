@@ -749,9 +749,19 @@ export async function handleRedeemOneTimeLectureLink(
 
   if (!claimed) {
     const exists = await OneTimeLectureLink.findOne({ tokenHash })
-      .select("usedAt")
+      .select("usedAt usedByUserId lectureId")
       .lean();
     if (!exists) return errorResponse("Invalid link", 404);
+    // Same student reopening the link (refresh, dev double-mount, etc.).
+    if (
+      exists.usedByUserId &&
+      exists.usedByUserId.toString() === ctx.user.id
+    ) {
+      return jsonResponse({
+        success: true,
+        lectureId: exists.lectureId.toString(),
+      });
+    }
     return errorResponse("Link already used", 410);
   }
 

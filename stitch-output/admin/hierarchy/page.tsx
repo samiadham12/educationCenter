@@ -1,9 +1,10 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { MaterialIcon } from "../../components/MaterialIcon";
 import { api } from "../../lib/api";
+import { isRtlLocale } from "@/shared/i18n/rtl";
 
 type Year = {
   _id: string;
@@ -102,6 +103,18 @@ async function fetchLecturesWithCodes(
 }
 
 export default function AcademicHierarchyPage() {
+  const locale = useLocale();
+  const isRtl = isRtlLocale(locale);
+  const chevronCollapsed = isRtl ? "chevron_left" : "chevron_right";
+  const borderStart = isRtl ? "border-r-2" : "border-l-2";
+  const treeIndent1 = isRtl
+    ? "mr-xl mt-xs flex flex-col gap-xs border-r-2 border-outline-variant/30 pr-md"
+    : "ml-xl mt-xs flex flex-col gap-xs border-l-2 border-outline-variant/30 pl-md";
+  const treeIndentN = isRtl
+    ? "mr-lg flex flex-col gap-xs pr-md"
+    : "ml-lg flex flex-col gap-xs pl-md";
+  const treeLeafIndent = isRtl ? "mr-lg pr-md" : "ml-lg pl-md";
+
   const t = useTranslations("admin.hierarchy");
   const tc = useTranslations("common");
 
@@ -491,14 +504,14 @@ export default function AcademicHierarchyPage() {
     if (loading) {
       return (
         <p className="p-md text-body-sm text-on-surface-variant">
-          Loading hierarchy…
+          {t("loadingHierarchy")}
         </p>
       );
     }
     if (tree.length === 0) {
       return (
         <p className="p-md text-body-sm text-on-surface-variant">
-          No academic years yet. Add a year to begin.
+          {t("emptyTree")}
         </p>
       );
     }
@@ -512,7 +525,7 @@ export default function AcademicHierarchyPage() {
             type="button"
             className={`group flex w-full items-center justify-between rounded-lg p-sm transition-all hover:bg-surface-variant ${
               selected?.type === "year" && selected.year._id === year._id
-                ? "border-l-2 border-primary bg-primary/10"
+                ? `${borderStart} border-primary bg-primary/10`
                 : ""
             }`}
             onClick={() => {
@@ -532,7 +545,7 @@ export default function AcademicHierarchyPage() {
               <span className="text-body-md font-medium">{year.name}</span>
             </span>
             <MaterialIcon
-              icon={yOpen ? "expand_more" : "chevron_right"}
+              icon={yOpen ? "expand_more" : chevronCollapsed}
               className="text-on-surface-variant opacity-0 group-hover:opacity-100"
             />
           </button>
@@ -544,14 +557,14 @@ export default function AcademicHierarchyPage() {
               return (
                 <div
                   key={term._id}
-                  className="ml-xl mt-xs flex flex-col gap-xs border-l-2 border-outline-variant/30 pl-md"
+                  className={treeIndent1}
                 >
                   <button
                     type="button"
                     className={`group flex w-full items-center justify-between rounded-lg p-sm hover:bg-surface-variant ${
                       selected?.type === "term" &&
                       selected.term._id === term._id
-                        ? "border-l-2 border-primary bg-primary/10"
+                        ? `${borderStart} border-primary bg-primary/10`
                         : ""
                     }`}
                     onClick={() => {
@@ -571,7 +584,7 @@ export default function AcademicHierarchyPage() {
                       />
                       <span className="text-body-md">{term.name}</span>
                     </span>
-                    <MaterialIcon icon={tOpen ? "expand_more" : "chevron_right"} />
+                    <MaterialIcon icon={tOpen ? "expand_more" : chevronCollapsed} />
                   </button>
 
                   {tOpen &&
@@ -581,7 +594,7 @@ export default function AcademicHierarchyPage() {
                       return (
                         <div
                           key={subject._id}
-                          className="ml-lg flex flex-col gap-xs pl-md"
+                          className={treeIndentN}
                         >
                           <button
                             type="button"
@@ -606,7 +619,9 @@ export default function AcademicHierarchyPage() {
                               <MaterialIcon icon="book" className="text-secondary" />
                               <span className="text-body-md">{subject.name}</span>
                             </span>
-                            <MaterialIcon icon={sOpen ? "expand_more" : "chevron_right"} />
+                            <MaterialIcon
+                              icon={sOpen ? "expand_more" : chevronCollapsed}
+                            />
                           </button>
 
                           {sOpen &&
@@ -616,7 +631,7 @@ export default function AcademicHierarchyPage() {
                               return (
                                 <div
                                   key={section._id}
-                                  className="ml-lg flex flex-col gap-xs pl-md"
+                                  className={treeIndentN}
                                 >
                                   <button
                                     type="button"
@@ -653,7 +668,7 @@ export default function AcademicHierarchyPage() {
                                       </span>
                                     </span>
                                     <MaterialIcon
-                                      icon={secOpen ? "expand_more" : "chevron_right"}
+                                      icon={secOpen ? "expand_more" : chevronCollapsed}
                                     />
                                   </button>
 
@@ -662,7 +677,7 @@ export default function AcademicHierarchyPage() {
                                       <button
                                         key={row.lecture._id}
                                         type="button"
-                                        className={`ml-lg flex w-full items-center justify-between rounded-lg p-sm pl-md hover:bg-surface-variant ${
+                                        className={`${treeLeafIndent} flex w-full items-center justify-between rounded-lg p-sm hover:bg-surface-variant ${
                                           selected?.type === "lecture" &&
                                           selected.row.lecture._id ===
                                             row.lecture._id
@@ -747,8 +762,10 @@ export default function AcademicHierarchyPage() {
         {/* Detail panel */}
         <section className="flex min-w-0 flex-1 flex-col gap-lg">
           <div className="flex items-center gap-sm rounded-xl border border-outline-variant bg-surface-container px-lg py-md">
-            <span className="text-label-md text-on-surface-variant">Hierarchy</span>
-            <MaterialIcon icon="chevron_right" className="text-sm text-outline" />
+            <span className="text-label-md text-on-surface-variant">
+              {t("breadcrumbTitle")}
+            </span>
+            <MaterialIcon icon={chevronCollapsed} className="text-sm text-outline" />
             <span className="text-label-md font-medium text-primary">
               {breadcrumb}
             </span>
@@ -759,10 +776,10 @@ export default function AcademicHierarchyPage() {
               <div className="flex h-full flex-col items-center justify-center text-center opacity-50">
                 <MaterialIcon icon="account_tree" className="mb-md text-6xl" />
                 <h3 className="text-headline-md font-semibold">
-                  Select an item to manage
+                  {t("selectItemTitle")}
                 </h3>
                 <p className="text-body-md text-on-surface-variant">
-                  Choose a level from the tree to view details and settings.
+                  {t("selectItemSubtitle")}
                 </p>
               </div>
             ) : (
@@ -779,10 +796,10 @@ export default function AcademicHierarchyPage() {
                             : selected.type === "subject"
                               ? selected.subject.name
                               : selected.section.name}{" "}
-                      Details
+                      {t("details")}
                     </h2>
                     <p className="text-body-md capitalize text-on-surface-variant">
-                      Level: {selected.type}
+                      {t("levelLabel")}: {t(`level.${selected.type}`)}
                     </p>
                   </div>
                   {selected.type !== "section" && (
@@ -811,7 +828,7 @@ export default function AcademicHierarchyPage() {
                   <div className="grid grid-cols-1 gap-lg md:grid-cols-2">
                     <div className="space-y-sm">
                       <label className="text-label-md text-primary">
-                        Display Name
+                        {t("displayName")}
                       </label>
                       <input
                         className={inputClass}
@@ -820,7 +837,9 @@ export default function AcademicHierarchyPage() {
                       />
                     </div>
                     <div className="space-y-sm">
-                      <label className="text-label-md text-primary">Order</label>
+                      <label className="text-label-md text-primary">
+                        {t("order")}
+                      </label>
                       <select
                         className={inputClass}
                         value={editOrder}
@@ -828,12 +847,14 @@ export default function AcademicHierarchyPage() {
                       >
                         {[1, 2, 3, 4].map((n) => (
                           <option key={n} value={n}>
-                            Year {n}
+                            {t("yearNumber", { n })}
                           </option>
                         ))}
                       </select>
                     </div>
                     <ActiveToggle
+                      label={t("status")}
+                      activeLabel={t("active")}
                       checked={editActive}
                       onChange={setEditActive}
                     />
@@ -846,7 +867,7 @@ export default function AcademicHierarchyPage() {
                         }
                       >
                         <MaterialIcon icon="add_circle" />
-                        Add Term
+                        {t("addTerm")}
                       </button>
                     </div>
                   </div>
@@ -855,7 +876,9 @@ export default function AcademicHierarchyPage() {
                 {selected.type === "term" && (
                   <div className="grid grid-cols-1 gap-lg md:grid-cols-2">
                     <div className="space-y-sm">
-                      <label className="text-label-md text-primary">Name</label>
+                      <label className="text-label-md text-primary">
+                        {t("fieldName")}
+                      </label>
                       <input
                         className={inputClass}
                         value={editName}
@@ -863,17 +886,21 @@ export default function AcademicHierarchyPage() {
                       />
                     </div>
                     <div className="space-y-sm">
-                      <label className="text-label-md text-primary">Order</label>
+                      <label className="text-label-md text-primary">
+                        {t("order")}
+                      </label>
                       <select
                         className={inputClass}
                         value={editOrder}
                         onChange={(e) => setEditOrder(Number(e.target.value))}
                       >
-                        <option value={1}>Term 1</option>
-                        <option value={2}>Term 2</option>
+                        <option value={1}>{t("termNumber", { n: 1 })}</option>
+                        <option value={2}>{t("termNumber", { n: 2 })}</option>
                       </select>
                     </div>
                     <ActiveToggle
+                      label={t("status")}
+                      activeLabel={t("active")}
                       checked={editActive}
                       onChange={setEditActive}
                     />
@@ -886,7 +913,7 @@ export default function AcademicHierarchyPage() {
                         }
                       >
                         <MaterialIcon icon="add_circle" />
-                        Add Subject
+                        {t("addSubject")}
                       </button>
                     </div>
                   </div>
@@ -896,7 +923,9 @@ export default function AcademicHierarchyPage() {
                   <div className="space-y-lg">
                     <div className="grid grid-cols-1 gap-lg md:grid-cols-2">
                       <div className="space-y-sm">
-                        <label className="text-label-md text-primary">Name</label>
+                        <label className="text-label-md text-primary">
+                          {t("fieldName")}
+                        </label>
                         <input
                           className={inputClass}
                           value={editName}
@@ -904,18 +933,22 @@ export default function AcademicHierarchyPage() {
                         />
                       </div>
                       <ActiveToggle
+                        label={t("status")}
+                        activeLabel={t("active")}
                         checked={editActive}
                         onChange={setEditActive}
                       />
                     </div>
                     <div className="rounded-xl border border-outline-variant bg-surface-container-high p-lg">
                       <p className="mb-md text-label-md text-on-surface">
-                        Section Count (set at creation)
+                        {t("sectionCountLockedTitle")}
                       </p>
                       <p className="text-body-md text-on-surface-variant">
-                        {selected.subject.sectionCount} sections auto-created
-                        (Section A, B
-                        {selected.subject.sectionCount === 3 ? ", C" : ""})
+                        {t("sectionCountLockedBody", {
+                          count: selected.subject.sectionCount,
+                          letters:
+                            selected.subject.sectionCount === 3 ? "A, B, C" : "A, B",
+                        })}
                       </p>
                     </div>
                   </div>
@@ -924,8 +957,7 @@ export default function AcademicHierarchyPage() {
                 {selected.type === "section" && (
                   <div className="space-y-md">
                     <p className="text-body-md text-on-surface-variant">
-                      Sections are auto-created with subjects and cannot be
-                      renamed via API. Add lectures below.
+                      {t("sectionImmutableHint")}
                     </p>
                     <button
                       type="button"
@@ -939,8 +971,8 @@ export default function AcademicHierarchyPage() {
                         })
                       }
                     >
-                      <MaterialIcon icon="add" className="mr-sm" />
-                      Add Lecture
+                      <MaterialIcon icon="add" className={isRtl ? "ml-sm" : "mr-sm"} />
+                      {t("addLecture")}
                     </button>
                   </div>
                 )}
@@ -949,7 +981,9 @@ export default function AcademicHierarchyPage() {
                   <div className="space-y-lg">
                     <div className="grid grid-cols-1 gap-lg md:grid-cols-2">
                       <div className="space-y-sm">
-                        <label className="text-label-md text-primary">Title</label>
+                        <label className="text-label-md text-primary">
+                          {t("fieldTitle")}
+                        </label>
                         <input
                           className={inputClass}
                           value={editName}
@@ -957,12 +991,14 @@ export default function AcademicHierarchyPage() {
                         />
                       </div>
                       <PublishedToggle
+                        label={t("publishedLabel")}
+                        helpText={t("visibleToStudents")}
                         checked={editPublished}
                         onChange={setEditPublished}
                       />
                       <div className="space-y-sm md:col-span-2">
                         <label className="text-label-md text-primary">
-                          Description
+                          {t("fieldDescription")}
                         </label>
                         <textarea
                           className={inputClass}
@@ -991,7 +1027,7 @@ export default function AcademicHierarchyPage() {
                             onClick={() => copyCode(lectureCode)}
                           >
                             <MaterialIcon icon="content_copy" />
-                            Copy
+                            {t("copyCode")}
                           </button>
                         )}
                         {lectureCode && selected && selected.type === "lecture" && (
@@ -1001,7 +1037,7 @@ export default function AcademicHierarchyPage() {
                             onClick={() => copyOneTimeLink(selected.row.lecture._id)}
                           >
                             <MaterialIcon icon="link" />
-                            Copy link
+                            {t("copyLink")}
                           </button>
                         )}
                         <button
@@ -1030,7 +1066,7 @@ export default function AcademicHierarchyPage() {
       {newLectureCode && (
         <div className="rounded-xl border border-primary/30 bg-primary/10 p-md">
           <p className="text-label-md text-on-surface">
-            New lecture access code:{" "}
+            {t("newLectureAccessCode")}:{" "}
             <code className="font-mono text-primary">{newLectureCode}</code>
           </p>
           <button
@@ -1038,7 +1074,7 @@ export default function AcademicHierarchyPage() {
             className="mt-sm text-primary hover:underline"
             onClick={() => copyCode(newLectureCode)}
           >
-            Copy code
+            {t("copyCode")}
           </button>
         </div>
       )}
@@ -1073,13 +1109,18 @@ export default function AcademicHierarchyPage() {
             <form className="space-y-lg p-lg" onSubmit={onModalSubmit}>
               {modal === "year" && (
                 <>
-                  <Field label={t("fieldName")} name="name" required />
+                  <Field
+                    label={t("fieldName")}
+                    name="name"
+                    required
+                    placeholder={t("enterField", { field: t("fieldName") })}
+                  />
                   <div className="space-y-sm">
-                    <label className="text-label-md text-primary">Order</label>
+                    <label className="text-label-md text-primary">{t("order")}</label>
                     <select name="order" className={inputClass} defaultValue={1}>
                       {[1, 2, 3, 4].map((n) => (
                         <option key={n} value={n}>
-                          Year {n}
+                          {t("yearNumber", { n })}
                         </option>
                       ))}
                     </select>
@@ -1088,21 +1129,33 @@ export default function AcademicHierarchyPage() {
               )}
               {modal === "term" && (
                 <>
-                  <Field label={t("fieldName")} name="name" required />
+                  <Field
+                    label={t("fieldName")}
+                    name="name"
+                    required
+                    placeholder={t("enterField", { field: t("fieldName") })}
+                  />
                   <div className="space-y-sm">
-                    <label className="text-label-md text-primary">Order</label>
+                    <label className="text-label-md text-primary">{t("order")}</label>
                     <select name="order" className={inputClass} defaultValue={1}>
-                      <option value={1}>Term 1</option>
-                      <option value={2}>Term 2</option>
+                      <option value={1}>{t("termNumber", { n: 1 })}</option>
+                      <option value={2}>{t("termNumber", { n: 2 })}</option>
                     </select>
                   </div>
                 </>
               )}
               {modal === "subject" && (
                 <>
-                  <Field label={t("fieldSubjectName")} name="name" required />
+                  <Field
+                    label={t("fieldSubjectName")}
+                    name="name"
+                    required
+                    placeholder={t("enterField", { field: t("fieldSubjectName") })}
+                  />
                   <div className="space-y-sm">
-                    <p className="text-label-md text-on-surface">Section Count</p>
+                    <p className="text-label-md text-on-surface">
+                      {t("sectionCount")}
+                    </p>
                     <div className="flex gap-xl">
                       <label className="flex cursor-pointer items-center gap-md">
                         <input
@@ -1111,11 +1164,15 @@ export default function AcademicHierarchyPage() {
                           value={2}
                           defaultChecked
                         />
-                        <span className="text-body-md">2 Sections</span>
+                        <span className="text-body-md">
+                          {t("sectionsCount", { count: 2 })}
+                        </span>
                       </label>
                       <label className="flex cursor-pointer items-center gap-md">
                         <input type="radio" name="sectionCount" value={3} />
-                        <span className="text-body-md">3 Sections</span>
+                        <span className="text-body-md">
+                          {t("sectionsCount", { count: 3 })}
+                        </span>
                       </label>
                     </div>
                   </div>
@@ -1123,11 +1180,20 @@ export default function AcademicHierarchyPage() {
               )}
               {modal === "lecture" && (
                 <>
-                  <Field label={t("fieldTitle")} name="title" required />
-                  <Field label={t("fieldDescription")} name="description" />
+                  <Field
+                    label={t("fieldTitle")}
+                    name="title"
+                    required
+                    placeholder={t("enterField", { field: t("fieldTitle") })}
+                  />
+                  <Field
+                    label={t("fieldDescription")}
+                    name="description"
+                    placeholder={t("enterField", { field: t("fieldDescription") })}
+                  />
                   <label className="flex items-center gap-md">
                     <input type="checkbox" name="isPublished" />
-                    <span className="text-body-md">Publish immediately</span>
+                    <span className="text-body-md">{t("publishImmediately")}</span>
                   </label>
                 </>
               )}
@@ -1157,11 +1223,12 @@ export default function AcademicHierarchyPage() {
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 p-lg backdrop-blur-sm">
           <div className="w-full max-w-md rounded-xl border border-outline-variant bg-surface-container p-lg shadow-xl">
             <h5 className="text-headline-md font-semibold text-on-surface">
-              Confirm deletion?
+              {t("confirmDeleteTitle")}
             </h5>
             <p className="mt-md text-body-md text-on-surface-variant">
-              This will permanently delete this {deleteTarget.type} and may
-              affect nested content. This cannot be undone.
+              {t("confirmDeleteBody", {
+                type: t(`level.${deleteTarget.type}`),
+              })}
             </p>
             <div className="mt-xl flex gap-md">
               <button
@@ -1214,10 +1281,12 @@ function Field({
   label,
   name,
   required,
+  placeholder,
 }: {
   label: string;
   name: string;
   required?: boolean;
+  placeholder?: string;
 }) {
   return (
     <div className="space-y-sm">
@@ -1226,24 +1295,28 @@ function Field({
         name={name}
         required={required}
         className={inputClass}
-        placeholder={`Enter ${label.toLowerCase()}`}
+        placeholder={placeholder}
       />
     </div>
   );
 }
 
 function ActiveToggle({
+  label,
+  activeLabel,
   checked,
   onChange,
 }: {
+  label: string;
+  activeLabel: string;
   checked: boolean;
   onChange: (v: boolean) => void;
 }) {
   return (
     <div className="space-y-sm">
-      <label className="text-label-md text-primary">Status</label>
+      <label className="text-label-md text-primary">{label}</label>
       <div className="flex items-center justify-between rounded-lg border border-outline-variant bg-background p-md">
-        <span className="text-body-md">Active</span>
+        <span className="text-body-md">{activeLabel}</span>
         <label className="relative inline-flex cursor-pointer items-center">
           <input
             type="checkbox"
@@ -1259,17 +1332,21 @@ function ActiveToggle({
 }
 
 function PublishedToggle({
+  label,
+  helpText,
   checked,
   onChange,
 }: {
+  label: string;
+  helpText: string;
   checked: boolean;
   onChange: (v: boolean) => void;
 }) {
   return (
     <div className="space-y-sm">
-      <label className="text-label-md text-primary">Published</label>
+      <label className="text-label-md text-primary">{label}</label>
       <div className="flex items-center justify-between rounded-lg border border-outline-variant bg-background p-md">
-        <span className="text-body-md">Visible to students</span>
+        <span className="text-body-md">{helpText}</span>
         <label className="relative inline-flex cursor-pointer items-center">
           <input
             type="checkbox"

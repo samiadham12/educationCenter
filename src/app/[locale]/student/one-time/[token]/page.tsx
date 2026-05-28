@@ -17,15 +17,37 @@ export default function OneTimeLectureLinkPage() {
 
     async function run() {
       if (!token) return;
+      const tokenKey = String(token);
+      const redeemKey = `one-time-redeem:${tokenKey}`;
+      if (typeof sessionStorage !== "undefined") {
+        const state = sessionStorage.getItem(redeemKey);
+        if (state === "done") {
+          const lectureId = sessionStorage.getItem(`${redeemKey}:lectureId`);
+          if (lectureId) {
+            router.replace(`/student/watch/${encodeURIComponent(lectureId)}`);
+            return;
+          }
+        }
+        if (state === "pending") return;
+        sessionStorage.setItem(redeemKey, "pending");
+      }
+
       try {
         const res = await api<RedeemRes>("/api/one-time-lecture-links/redeem", {
           method: "POST",
-          body: JSON.stringify({ token: String(token) }),
+          body: JSON.stringify({ token: tokenKey }),
         });
         if (cancelled) return;
+        if (typeof sessionStorage !== "undefined") {
+          sessionStorage.setItem(redeemKey, "done");
+          sessionStorage.setItem(`${redeemKey}:lectureId`, res.lectureId);
+        }
         router.replace(`/student/watch/${encodeURIComponent(res.lectureId)}`);
       } catch (e) {
         if (cancelled) return;
+        if (typeof sessionStorage !== "undefined") {
+          sessionStorage.removeItem(redeemKey);
+        }
         setError(e instanceof Error ? e.message : "Failed to open lecture");
       }
     }

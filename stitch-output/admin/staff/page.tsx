@@ -24,11 +24,13 @@ const inputClass =
   "w-full rounded-lg border border-outline-variant bg-background px-md py-sm text-body-md text-on-surface outline-none transition-all focus:border-primary focus:ring-1 focus:ring-primary";
 
 function getInitials(name: string): string {
-  const parts = name.trim().split(/\s+/);
+  const safe = (name ?? "").trim();
+  if (!safe) return "??";
+  const parts = safe.split(/\s+/);
   if (parts.length >= 2) {
     return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
   }
-  return name.slice(0, 2).toUpperCase();
+  return safe.slice(0, 2).toUpperCase();
 }
 
 function passwordStrength(
@@ -122,7 +124,18 @@ export default function StaffAccountsPage() {
       const data = await api<StaffListResponse>(
         "/api/users?role=ADMIN,MODERATOR",
       );
-      setUsers(data.users);
+      const list = Array.isArray((data as StaffListResponse | undefined)?.users)
+        ? (data.users as unknown[])
+        : [];
+      setUsers(
+        list
+          .filter((u): u is StaffUser => Boolean(u && typeof u === "object"))
+          .map((u) => ({
+            ...u,
+            name: String((u as StaffUser).name ?? "").trim(),
+            email: String((u as StaffUser).email ?? "").trim(),
+          })),
+      );
     } catch (e) {
       showToast(
         e instanceof Error ? e.message : t("loadFailed"),
@@ -153,14 +166,19 @@ export default function StaffAccountsPage() {
     if (!term) return users;
     return users.filter(
       (u) =>
-        u.name.toLowerCase().includes(term) ||
-        u.email.toLowerCase().includes(term),
+        String(u.name ?? "")
+          .toLowerCase()
+          .includes(term) ||
+        String(u.email ?? "")
+          .toLowerCase()
+          .includes(term),
     );
   }, [users, search]);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
     const name = String(fd.get("name") ?? "").trim();
     const email = String(fd.get("email") ?? "").trim();
     const pwd = String(fd.get("password") ?? "");
@@ -190,7 +208,7 @@ export default function StaffAccountsPage() {
         body: JSON.stringify({ name, email, password: pwd, role }),
       });
       showToast(t("createSuccess"), "check_circle");
-      e.currentTarget.reset();
+      form.reset();
       setPassword("");
       await load();
     } catch (err) {

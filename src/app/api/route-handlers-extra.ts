@@ -28,6 +28,7 @@ import { Term } from "@/features/terms/models/Term.model";
 import { Subject } from "@/features/subjects/models/Subject.model";
 import { Section } from "@/features/sections/models/Section.model";
 import { Lecture } from "@/features/lectures/models/Lecture.model";
+import { OneTimeLectureLink } from "@/features/one-time-links/models/OneTimeLectureLink.model";
 import { ensureDefaultAcademicYears } from "@/features/academic-years/services/ensure-default-academic-years";
 import { STAFF_ROLES } from "@/shared/constants/roles";
 
@@ -183,6 +184,12 @@ export async function handleRegenerateLectureCode(
     { lectureId: body.lectureId },
     { code, ...lectureCodeDefaults() },
     { new: true, upsert: true },
+  );
+
+  // Old one-time URLs must not stay valid after a new access code is issued.
+  await OneTimeLectureLink.updateMany(
+    { lectureId: body.lectureId, usedAt: null },
+    { $set: { usedAt: new Date() } },
   );
 
   return jsonResponse({ lectureCode });
