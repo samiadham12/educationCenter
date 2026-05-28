@@ -1,0 +1,22 @@
+{
+  "AUTH_EMAIL_PASSWORD_REQUIRED": "البريد الإلكتروني وكلمة المرور مطلوبان",
+  "AUTH_INVALID_CREDENTIALS": "بيانات الاعتماد غير صحيحة",
+  "AUTH_UNAUTHORIZED": "غير مصرح",
+  "AUTH_SIGNUP_FIELDS_REQUIRED": "الاسم والبريد وكلمة المرور مطلوبة",
+  "AUTH_PASSWORD_TOO_SHORT": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
+  "AUTH_EMAIL_REGISTERED": "البريد الإلكتروني مسجل مسبقاً",
+  "AUTH_SIGNUP_NO_YEAR": "التسجيل غير متاح. لا توجد سنة دراسية مُعدّة.",
+  "AUTH_EMAIL_EXISTS": "البريد الإلكتروني موجود مسبقاً",
+  "USER_NOT_FOUND": "المستخدم غير موجود",
+  "METHOD_NOT_ALLOWED": "الطريقة غير مسموحة",
+  "VALIDATION_FAILED": "فشل التحقق",
+  "CODE_TOO_MANY_ATTEMPTS": "محاولات كثيرة لإدخال الكود",
+  "CODE_INVALID": "كود غير صالح",
+  "CODE_EXPIRED": "انتهت صلاحية الكود",
+  "CODE_LIMIT_REACHED": "تم الوصول إلى حد استخدام الكود",
+  "ACCESS_DENIED": "تم رفض الوصول",
+  "MEDIA_NOT_FOUND": "الوسائط غير موجودة",
+  "NOT_FOUND": "غير موجود",
+  "LOCALE_INVALID": "لغة غير صالحة",
+  "LOCALE_FORBIDDEN": "اللغة غير مفعّلة"
+}

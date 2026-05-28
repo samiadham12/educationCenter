@@ -1,0 +1,14 @@
+{
+  "dashboard": "Dashboard",
+  "staff": "Staff Accounts",
+  "students": "Student Accounts",
+  "uploads": "Media Upload",
+  "hierarchy": "Academic Hierarchy",
+  "users": "Users & Subscriptions",
+  "usage": "Usage Analytics",
+  "searchPlaceholder": "Search…",
+  "signOut": "Sign out",
+  "adminPanel": "Admin Panel",
+  "openMenu": "Open menu",
+  "closeMenu": "Close menu"
+}

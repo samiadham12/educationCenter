@@ -1,0 +1,22 @@
+{
+  "AUTH_EMAIL_PASSWORD_REQUIRED": "Email and password required",
+  "AUTH_INVALID_CREDENTIALS": "Invalid credentials",
+  "AUTH_UNAUTHORIZED": "Unauthorized",
+  "AUTH_SIGNUP_FIELDS_REQUIRED": "Name, email, and password are required",
+  "AUTH_PASSWORD_TOO_SHORT": "Password must be at least 8 characters",
+  "AUTH_EMAIL_REGISTERED": "Email already registered",
+  "AUTH_SIGNUP_NO_YEAR": "Registration is not available. No academic year configured.",
+  "AUTH_EMAIL_EXISTS": "Email already exists",
+  "USER_NOT_FOUND": "User not found",
+  "METHOD_NOT_ALLOWED": "Method not allowed",
+  "VALIDATION_FAILED": "Validation failed",
+  "CODE_TOO_MANY_ATTEMPTS": "Too many code attempts",
+  "CODE_INVALID": "Invalid code",
+  "CODE_EXPIRED": "Code expired",
+  "CODE_LIMIT_REACHED": "Code usage limit reached",
+  "ACCESS_DENIED": "Access denied",
+  "MEDIA_NOT_FOUND": "Media not found",
+  "NOT_FOUND": "Not found",
+  "LOCALE_INVALID": "Invalid locale",
+  "LOCALE_FORBIDDEN": "Locale is not enabled"
+}

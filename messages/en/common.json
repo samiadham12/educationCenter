@@ -1,0 +1,20 @@
+{
+  "appName": "EduPortal",
+  "loading": "Loading…",
+  "save": "Save",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "edit": "Edit",
+  "search": "Search",
+  "close": "Close",
+  "confirm": "Confirm",
+  "back": "Back",
+  "next": "Next",
+  "submit": "Submit",
+  "language": "Language",
+  "selectLanguage": "Select language",
+  "noResults": "No results found",
+  "errorGeneric": "Something went wrong. Please try again.",
+  "paginationPrevious": "Previous",
+  "paginationNext": "Next"
+}

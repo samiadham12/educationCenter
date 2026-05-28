@@ -1,0 +1,20 @@
+{
+  "appName": "إيدوبورتال",
+  "loading": "جاري التحميل…",
+  "save": "حفظ",
+  "cancel": "إلغاء",
+  "delete": "حذف",
+  "edit": "تعديل",
+  "search": "بحث",
+  "close": "إغلاق",
+  "confirm": "تأكيد",
+  "back": "رجوع",
+  "next": "التالي",
+  "submit": "إرسال",
+  "language": "اللغة",
+  "selectLanguage": "اختر اللغة",
+  "noResults": "لا توجد نتائج",
+  "errorGeneric": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+  "paginationPrevious": "السابق",
+  "paginationNext": "التالي"
+}
